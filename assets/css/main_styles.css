@@ -1,0 +1,248 @@
+    body {
+        margin: 0;
+        font-family: 'Montserrat', sans-serif;
+        /* Fuente principal del cuerpo */
+        background-color: #fff;
+        /* Fondo general */
+    }
+
+    header {
+        background: #000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 40px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        width: 100%;
+        z-index: 1000;
+        box-sizing: border-box;
+        /* Incluir padding en el ancho */
+    }
+
+    header .logo {
+        font-size: 24px;
+        font-weight: bold;
+        font-family: 'Montserrat', sans-serif;
+        /* Asegura que el logo use Montserrat */
+        color: #fff;
+    }
+
+    nav a {
+        margin-left: 0px;
+        margin-right: 70px;
+        text-decoration: none;
+        color: #fff;
+        font-weight: 525;
+    }
+
+    .hero {
+        height: 100vh;
+        background: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f') center/cover no-repeat;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding-top: 80px;
+        color: #fff;
+        position: relative;
+    }
+
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1;
+    }
+
+    .hero h1,
+    .hero p,
+    .hero .btn {
+        z-index: 2;
+        position: relative;
+    }
+
+    .hero h1 {
+        font-size: 48px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .hero p {
+        font-size: 18px;
+        margin: 20px 0;
+        color: #fff;
+        /* Asegura que el párrafo sea blanco */
+    }
+
+    .hero .btn {
+        background-color: #76381eff;
+        /* Color del botón del hero */
+        color: white;
+        padding: 12px 30px;
+        text-decoration: none;
+        font-weight: bold;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+
+    .hero .btn:hover {
+        background-color: #9f4724ff;
+    }
+
+    .features {
+        display: flex;
+        justify-content: space-around;
+        padding: 80px 40px;
+        background-color: #f9f9f9;
+        text-align: center;
+    }
+
+    .feature {
+        flex: 1;
+        margin: 0 20px;
+    }
+
+    .feature h3 {
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .feature p {
+        font-size: 14px;
+        color: #666;
+    }
+
+    /* Estilos generales para mensajes (del PHP) */
+    .mensaje {
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    .exito {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .error {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    /* Contenedor principal de la aplicación PHP (debajo del hero) */
+    .container {
+        max-width: 1200px;
+        margin: 30px auto;
+        /* Margen para separar del hero */
+        background: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .libro {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        background: #f9f9f9;
+    }
+
+    .libro img {
+        max-width: 150px;
+        max-height: 200px;
+        float: left;
+        margin-right: 15px;
+    }
+
+    .clear {
+        clear: both;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    button,
+    .button {
+        background: #333;
+        color: #fff;
+        border: 0;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 4px;
+        text-decoration: none;
+        display: inline-block;
+        margin-right: 5px;
+    }
+
+    button:hover,
+    .button:hover {
+        background: #555;
+    }
+
+    .admin-section {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #ddd;
+    }
+
+    .auth-links {
+        text-align: right;
+        margin-bottom: 20px;
+    }
+
+    .auth-links a {
+        margin-left: 15px;
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .auth-links a:hover {
+        text-decoration: underline;
+    }
+
+    /* Media queries para responsividad */
+    @media (max-width: 768px) {
+        header {
+            padding: 15px 20px;
+        }
+
+        header .logo {
+            font-size: 20px;
+        }
+
+        nav a {
+            margin-right: 20px;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+        }
+
+        .hero p {
+            font-size: 16px;
+        }
+
+        .features {
+            flex-direction: column;
+            padding: 40px 20px;
+        }
+
+        .feature {
+            margin: 20px 0;
+        }
+
+        .container {
+            margin: 20px auto;
+            padding: 15px;
+        }
+    }
+    

@@ -1,0 +1,216 @@
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5; /* Fondo gris claro */
+    overflow: hidden; /* Evita barras de desplazamiento innecesarias */
+}
+
+.register-container {
+    display: flex;
+    background-color: #fff;
+    border-radius: 12px; /* Ligeramente más redondeado */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Sombra ligeramente más pronunciada */
+    overflow: hidden; /* Para que los bordes redondeados se apliquen correctamente */
+    max-width: 650px; /* MODIFICADO: Ancho máximo del contenedor ligeramente más grande */
+    width: 95%; /* Ancho responsivo */
+}
+
+.left-panel {
+    flex: 1;
+    background-color: rgba(245, 160, 100, 1); /* Amarillo vibrante */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 5px; /* MODIFICADO: Ligeramente aumentado padding */
+    text-align: center;
+    color: #333; /* Color de texto para el panel izquierdo */
+}
+
+.left-panel .user-image-placeholder {
+    width: 60px; /* MODIFICADO: Ligeramente aumentado tamaño de imagen */
+    height: 60px; /* MODIFICADO: Ligeramente aumentado tamaño de imagen */
+    background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco semitransparente */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 6px; /* MODIFICADO: Ligeramente aumentado margen */
+    overflow: hidden; /* Para contener la imagen si se carga */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); /* Sombra ligeramente más pronunciada */
+}
+
+.left-panel .user-image-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.left-panel .user-image-placeholder .icon {
+    font-size: 30px; /* MODIFICADO: Ligeramente aumentado tamaño de icono */
+    color: rgba(139, 69, 19, 1); /* Color de icono para el placeholder */
+}
+
+.left-panel h2 {
+    font-size: 1em; /* MODIFICADO: Ligeramente aumentado tamaño de fuente */
+    margin-bottom: 3px; /* MODIFICADO: Ligeramente aumentado margen */
+    font-weight: 700;
+}
+
+.left-panel p {
+    font-size: 0.7em; /* MODIFICADO: Ligeramente aumentado tamaño de fuente */
+    line-height: 1.1; /* Ligeramente ajustado line-height */
+    color: #555;
+}
+
+.right-panel {
+    flex: 2; /* Ocupa más espacio que el panel izquierdo */
+    padding: 12px; /* MODIFICADO: Ligeramente aumentado padding */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.right-panel h2 {
+    font-size: 1em; /* MODIFICADO: Ligeramente aumentado tamaño de fuente */
+    color: #333;
+    margin-bottom: 10px; /* MODIFICADO: Ligeramente aumentado margen */
+    text-align: center;
+    font-weight: 600;
+}
+
+.form-row {
+    display: flex;
+    gap: 8px; /* MODIFICADO: Ligeramente aumentado gap */
+    margin-bottom: 4px; /* MODIFICADO: Ligeramente aumentado margen */
+}
+
+.form-group {
+    flex: 1;
+    margin-bottom: 4px; /* MODIFICADO: Ligeramente aumentado margen */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 1px; /* MODIFICADO: Ligeramente aumentado margen */
+    font-weight: 500;
+    color: #555;
+    font-size: 0.65em; /* MODIFICADO: Ligeramente aumentado tamaño de fuente */
+}
+
+.form-group input[type="text"],
+.form-group input[type="tel"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="date"],
+.form-group input[type="file"],
+.form-group select { /* Añadido select para aplicar estilos */
+    width: 100%;
+    padding: 5px 7px; /* MODIFICADO: Ligeramente aumentado padding */
+    border: 1px solid #ddd;
+    border-radius: 5px; /* Ligeramente más redondeado */
+    font-size: 0.75em; /* MODIFICADO: Ligeramente aumentado tamaño de fuente */
+    box-sizing: border-box; /* Incluir padding en el ancho */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input[type="file"] {
+    padding: 2px 0; /* Ligeramente más padding para el input de archivo */
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="tel"]:focus,
+.form-group input[type="email"]:focus,
+.form-group input[type="password"]:focus,
+.form-group input[type="date"]:focus,
+.form-group input[type="file"]:focus,
+.form-group select:focus { /* Añadido select para aplicar estilos */
+    border-color: #007bff;
+    box-shadow: 0 0 0 1px rgba(0, 123, 255, 0.2); /* Sombra de enfoque ligeramente más pronunciada */
+    outline: none;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end; /* Alinea los botones a la derecha */
+    gap: 4px; /* MODIFICADO: Ligeramente aumentado gap */
+    margin-top: 8px; /* MODIFICADO: Ligeramente aumentado margen */
+}
+
+.btn {
+    padding: 5px 10px; /* MODIFICADO: Ligeramente aumentado padding */
+    border: none;
+    border-radius: 5px; /* Ligeramente más redondeado */
+    cursor: pointer;
+    font-size: 0.75em; /* MODIFICADO: Ligeramente aumentado tamaño de fuente */
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-cancel {
+    background-color: #e0e0e0;
+    color: #555;
+}
+
+.btn-cancel:hover {
+    background-color: #d0d0d0;
+    transform: translateY(-0.5px);
+}
+
+.btn-register {
+    background-color: #28a745; /* Verde para el botón principal */
+    color: white;
+}
+
+.btn-register:hover {
+    background-color: #218838;
+    transform: translateY(-0.5px);
+}
+
+/* Estilo para el mensaje de error de cédula */
+small#cedulaError {
+    font-size: 0.55em; /* MODIFICADO: Ligeramente aumentado tamaño de fuente del mensaje de error */
+    margin-top: 1px; /* Ligeramente aumentado margen */
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .register-container {
+        flex-direction: column;
+        max-width: 350px; /* MODIFICADO: Ancho en móviles ligeramente más grande */
+        width: 98%;
+    }
+
+    .left-panel {
+        padding: 8px 4px; /* MODIFICADO: Ligeramente aumentado padding */
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 12px; /* Ligeramente más redondeado */
+    }
+
+    .right-panel {
+        padding: 8px 6px; /* MODIFICADO: Ligeramente aumentado padding */
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0; /* Eliminar gap entre columnas en móvil */
+    }
+
+    .form-group {
+        margin-bottom: 4px; /* MODIFICADO: Ligeramente aumentado margen */
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 3px; /* MODIFICADO: Ligeramente aumentado gap */
+    }
+
+    .btn {
+        width: 100%; /* Botones de ancho completo en móvil */
+    }
+}
