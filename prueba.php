@@ -127,6 +127,36 @@ header {
             background-color: #27ae60;
             color: white;
             font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .book-card button:hover {
+            background-color: #219a52;
+        }
+
+        .book-card::before {
+            content: "👁️ Ver detalles";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .book-card {
+            position: relative;
+        }
+
+        .book-card:hover::before {
+            opacity: 1;
         }
 
         @media (max-width: 768px) {
@@ -209,6 +239,7 @@ header {
             case 'sql_error': echo "Error al realizar la reserva."; break;
             case 'no_disponible': echo "Este libro no está disponible actualmente."; break;
             case 'ya_reservado': echo "Ya tienes este libro reservado."; break;
+            case 'libro_no_encontrado': echo "El libro solicitado no fue encontrado."; break;
             default: echo "Error desconocido.";
         }
         ?>
