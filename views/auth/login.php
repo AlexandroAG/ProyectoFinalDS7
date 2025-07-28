@@ -1,7 +1,11 @@
 <?php
 // login.php
 // Puedes iniciar la sesión aquí si planeas usarla para mensajes o redirecciones.
-session_start(); 
+session_start();
+if (isset($_SESSION['user_id'])) {
+    header("Location: ../../index.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">

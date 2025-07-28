@@ -1,88 +1,85 @@
 <?php
-// process_login.php
-// Habilitar la visualización de errores para depuración (¡Quitar en producción!)
+require_once __DIR__ . '/../../class/UniversalSatinizer.php';
+
+// Habilitar errores solo en desarrollo
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-session_start(); // Iniciar la sesión para almacenar datos del usuario
+session_start();
 
-// Definir las constantes de conexión a la base de datos
+// Configuración de la base de datos
 define('DB_HOST', 'localhost');
-define('DB_USER', 'alex03'); // Asegúrate de que este usuario tenga permisos para SELECT
-define('DB_PASS', '0123456789'); 
-define('DB_NAME', 'biblioteca_sencilla'); // Nombre de tu base de datos
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'biblioteca');
 
-// Establecer conexión a la base de datos
-$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
-// Verificar la conexión
-if ($conn->connect_error) {
-    // Si la conexión falla, redirige al login con un mensaje de error
-    // Esta redirección podría no funcionar si el error de conexión es muy temprano.
-    header("Location: login.php?error=" . urlencode("Error de conexión a la base de datos: " . $conn->connect_error));
-    exit();
-}
-
-// Verificar si la solicitud es de tipo POST (es decir, si el formulario fue enviado)
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Obtener y sanear los datos del formulario
-    $username_or_email = $conn->real_escape_string($_POST['username'] ?? ''); // El nombre del campo en login.php es 'username'
-    $password = $_POST['password'] ?? '';
-
-    // Validaciones básicas
-    if (empty($username_or_email) || empty($password)) {
-        header("Location: login.php?error=" . urlencode("Por favor, ingresa tu nombre de usuario/email y contraseña."));
-        exit();
-    }
-
-    // Buscar usuario por nombre de usuario o email
-    // Seleccionamos todas las columnas necesarias para la sesión y verificación
-    $stmt = $conn->prepare("SELECT id, primer_nombre, primer_apellido, email, password, role FROM users WHERE email = ? OR cedula = ?");
+try {
+    // Establecer conexión
+    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     
-    // Es importante usar 'email' o 'cedula' aquí, dependiendo de cómo quieres que el usuario inicie sesión.
-    // Si el campo de login es "username" pero quieres que acepte email o cedula,
-    // entonces el bind_param debe usar la misma variable para ambos placeholders.
-    if ($stmt === false) {
-        header("Location: login.php?error=" . urlencode("Error al preparar la consulta de login: " . $conn->error));
-        exit();
+    if ($conn->connect_error) {
+        throw new RuntimeException("Error de conexión a la base de datos: " . $conn->connect_error);
     }
-    $stmt->bind_param("ss", $username_or_email, $username_or_email);
-    $stmt->execute();
-    $result = $stmt->get_result();
 
-    if ($result->num_rows === 1) {
-        $user = $result->fetch_assoc();
-        // Verificar la contraseña hasheada
-        if (password_verify($password, $user['password'])) {
-            // Contraseña correcta, iniciar sesión
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['primer_nombre'] . ' ' . $user['primer_apellido']; // Usar nombre completo para la sesión
-            $_SESSION['user_email'] = $user['email'];
-            $_SESSION['user_role'] = $user['role'];
-            
-            // Redirigir al usuario a la página principal (index.php)
-            // La ruta es relativa a process_login.php, que está en views/auth/
-            header("Location: ../../index.php"); 
-            exit();
-        } else {
-            // Contraseña incorrecta
-            header("Location: login.php?error=" . urlencode("Credenciales incorrectas. Por favor, inténtalo de nuevo."));
-            exit();
+    // Inicializar sanitizador
+    $sanitizer = new UniversalSanitizer($conn);
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        // Sanitizar y validar inputs
+        $username_or_email = $sanitizer->basicString($_POST['username'] ?? '');
+        $password = $_POST['password'] ?? ''; // La contraseña no se sanitiza, se verifica directamente
+
+        // Validar campos requeridos
+        if (empty($username_or_email) || empty($password)) {
+            throw new InvalidArgumentException("Por favor, ingresa tu nombre de usuario/email y contraseña.");
         }
-    } else {
-        // Usuario o email no encontrado
-        header("Location: login.php?error=" . urlencode("Credenciales incorrectas. Por favor, inténtalo de nuevo."));
-        exit();
+
+        // Buscar usuario (usando prepared statements)
+        $stmt = $conn->prepare("SELECT id, primer_nombre, primer_apellido, email, password, role FROM usuarios WHERE email = ? OR cedula = ?");
+        
+        if ($stmt === false) {
+            throw new RuntimeException("Error al preparar la consulta de login: " . $conn->error);
+        }
+
+        $stmt->bind_param("ss", $username_or_email, $username_or_email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 1) {
+            $user = $result->fetch_assoc();
+            
+            // Verificar contraseña
+            if (password_verify($password, $user['password'])) {
+                // Sanitizar datos antes de guardar en sesión
+                $_SESSION['user_id'] = $sanitizer->integer($user['id']);
+                $_SESSION['username'] = $sanitizer->name($user['primer_nombre'] . ' ' . $user['primer_apellido']);
+                $_SESSION['user_email'] = $sanitizer->email($user['email']);
+                $_SESSION['user_role'] = $sanitizer->role($user['role']);
+                
+                header("Location: ../../index.php");
+                exit();
+            }
+        }
+
+        // Mensaje genérico para evitar enumeración de usuarios
+        throw new RuntimeException("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
     }
 
-    $stmt->close();
-
-} else {
-    // Si se accede directamente a este archivo sin POST, redirige al formulario de login
+    // Si no es POST, redirigir
     header("Location: login.php");
     exit();
-}
 
-// Cerrar la conexión (opcional, PHP la cierra automáticamente al finalizar el script)
-$conn->close();
-?>
+} catch (InvalidArgumentException $e) {
+    // Errores de validación
+    header("Location: login.php?error=" . urlencode($e->getMessage()));
+    exit();
+} catch (RuntimeException $e) {
+    // Errores de sistema/database
+    header("Location: login.php?error=" . urlencode("Ocurrió un error. Por favor intenta nuevamente."));
+    exit();
+} finally {
+    // Cerrar conexión si existe
+    if (isset($conn)) {
+        $conn->close();
+    }
+}

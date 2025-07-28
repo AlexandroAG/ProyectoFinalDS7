@@ -90,7 +90,8 @@
                 </div>
                 <div class="form-group">
                     <label for="user_image">Imagen de Usuario:</label>
-                    <input type="file" id="user_image" name="user_image" accept="image/*">
+                    <input type="file" id="user_image" name="user_image" accept="image/*
+                    ">
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-cancel" onclick="window.location.href='login.php'">Cancelar</button>

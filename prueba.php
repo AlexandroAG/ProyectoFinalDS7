@@ -1,3 +1,9 @@
+
+<?php
+require_once __DIR__ . '/controllers/auth_middleware.php';
+?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>

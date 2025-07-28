@@ -1,4 +1,9 @@
 
+<?php
+require_once __DIR__ . '/controllers/auth_middleware.php';
+?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -17,11 +22,11 @@
     <header>
         <div class="logo">📚Sistema de Biblioteca</div>
         <nav>
-            <a href="#">Inicio</a>
-            <a href="#">Libros</a>
+            <a href="index.php">Inicio</a>
+            <a href="prueba.php">Libros</a>
             <a href="#">Reservados</a>
-            <a href="#">Roles </a>
-            <a href="#">Perfil</a>
+            <a href="#">Roles</a>
+            <a href="/ProyectoFinalDS7/views/profile.php">Perfil</a>
         </nav>
     </header>
 
