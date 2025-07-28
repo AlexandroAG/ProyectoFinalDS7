@@ -3,17 +3,6 @@ require_once __DIR__ . '/../models/Reservation.php';
 require_once __DIR__ . '/auth_middleware.php';
 
 class ReservationController {
-    // Devuelve un array de IDs de libros reservados por el usuario (solo reservas activas)
-    public function getUserReservedBookIds($userId) {
-        require_once __DIR__ . '/../config/Database.php';
-        $database = new Database();
-        $conn = $database->connect();
-        $sql = "SELECT libro_id FROM prestamos WHERE usuario_id = :user_id AND devuelto = 0";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([':user_id' => $userId]);
-        $ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
-        return $ids ? $ids : [];
-    }
     private $reservationModel;
 
     public function __construct() {
