@@ -29,7 +29,9 @@ $userData = $authController->getProfileData();
             <a href="index.php">Inicio</a>
             <a href="prueba.php">Libros</a>
             <a href="./views/reservation.php">Mis Reservas</a>
-            <a href="./views/auth/rol.php">Roles</a>
+            <?php if (!empty($userData) && $userData['role'] === 'admin'): ?>
+                <a href="./views/auth/rol.php">Roles</a>
+            <?php endif; ?>
             <a href="/ProyectoFinalDS7/views/profile.php">Perfil</a>
         </nav>
     </header>

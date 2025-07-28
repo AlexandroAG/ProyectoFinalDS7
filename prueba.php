@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/controllers/auth_middleware.php';
 require_once __DIR__ . '/controllers/AuthController.php';
+require_once __DIR__ . '/controllers/ReservationController.php';
 require_once './config/Database.php';
 
 // Obtener datos del usuario para verificar rol
@@ -41,6 +42,17 @@ $categoriesSql = "SELECT id, nombre FROM categorias_libros ORDER BY nombre";
 $categoriesStmt = $conn->prepare($categoriesSql);
 $categoriesStmt->execute();
 $categories = $categoriesStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Obtener libros ya reservados por el usuario actual
+$librosReservados = [];
+if (isset($_SESSION['user_id'])) {
+    $reservationController = new ReservationController();
+    foreach ($libros as $libro) {
+        if ($reservationController->hasActiveReservation($libro['id'])) {
+            $librosReservados[] = $libro['id'];
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -136,8 +148,14 @@ header {
             transition: background-color 0.3s ease;
         }
 
-        .book-card button:hover {
+        .book-card button:hover:not(:disabled) {
             background-color: #219a52;
+        }
+
+        .book-card button:disabled {
+            background-color: #6c757d !important;
+            cursor: not-allowed !important;
+            opacity: 0.8;
         }
 
         .book-card::before {
@@ -205,7 +223,9 @@ header {
             <a href="/ProyectoFinalDS7/index.php">Inicio</a>
             <a href="/ProyectoFinalDS7/prueba.php">Libros</a>
             <a href="/ProyectoFinalDS7/views/reservation.php">Mis Reservas</a>
-            <a href="/ProyectoFinalDS7/views/auth/rol.php">Roles</a>
+            <?php if (!empty($userData) && $userData['role'] === 'admin'): ?>
+                <a href="/ProyectoFinalDS7/views/auth/rol.php">Roles</a>
+            <?php endif; ?>
             <a href="/ProyectoFinalDS7/views/profile.php">Perfil</a>
         </nav>
     </header>
@@ -254,10 +274,21 @@ header {
                             <p><strong>Año:</strong> <?= htmlspecialchars($libro['anio_publicacion']) ?></p>
                         </div>
                     </a>
-                    <form action="reservar_libro.php" method="POST">
-                        <input type="hidden" name="libro_id" value="<?= $libro['id'] ?>">
-                        <button type="submit">Reservar</button>
-                    </form>
+                    <?php 
+                    $yaReservado = in_array($libro['id'], $librosReservados);
+                    $noDisponible = $libro['cantidad_disponible'] <= 0;
+                    ?>
+                    
+                    <?php if (!$yaReservado && !$noDisponible): ?>
+                        <form action="reservar_libro.php" method="POST">
+                            <input type="hidden" name="libro_id" value="<?= $libro['id'] ?>">
+                            <button type="submit">Reservar</button>
+                        </form>
+                    <?php else: ?>
+                        <button disabled style="width:100%;padding:10px;background:#6c757d;color:white;font-weight:bold;border:none;border-radius:4px;cursor:not-allowed;">
+                            <?= $yaReservado ? 'Ya reservado' : 'No disponible' ?>
+                        </button>
+                    <?php endif; ?>
                     <?php if (!empty($userData) && $userData['role'] === 'admin'): ?>
                         <form action="controllers/eliminar_libro.php" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este libro? Esta acción no se puede deshacer.');" style="margin-top:8px;">
                             <input type="hidden" name="libro_id" value="<?= $libro['id'] ?>">
@@ -272,9 +303,17 @@ header {
     <?php else: ?>
         <p>No se encontraron libros con los filtros aplicados.</p>
     <?php endif; ?>
-    <?php if (isset($_GET['success']) && $_GET['success'] === 'reservado'): ?>
-    <div style="color: green; font-weight: bold;">¡Reserva realizada con éxito!</div>
-<?php endif; ?>
+    <?php if (isset($_GET['success'])): ?>
+        <div style="color: green; font-weight: bold; background: #d4edda; padding: 10px; border-radius: 5px; margin: 10px 0;">
+            <?php
+            switch ($_GET['success']) {
+                case 'reservado': echo "¡Reserva realizada con éxito!"; break;
+                case 'eliminado': echo "¡Libro eliminado correctamente!"; break;
+                default: echo "¡Operación completada con éxito!";
+            }
+            ?>
+        </div>
+    <?php endif; ?>
 
 <?php if (isset($_GET['error'])): ?>
     <div style="color: red; font-weight: bold;">
@@ -287,6 +326,7 @@ header {
             case 'ya_reservado': echo "Ya tienes este libro reservado."; break;
             case 'libro_no_encontrado': echo "El libro solicitado no fue encontrado."; break;
             case 'acceso_denegado': echo "Acceso denegado. Solo los administradores pueden descargar reportes."; break;
+            case 'eliminado': echo "Error al eliminar el libro."; break;
             default: echo "Error desconocido.";
         }
         ?>

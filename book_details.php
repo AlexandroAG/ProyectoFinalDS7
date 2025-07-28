@@ -325,7 +325,9 @@ if (!empty($userData) && $userData['role'] === 'admin' && $_SERVER['REQUEST_METH
             <a href="/ProyectoFinalDS7/index.php">Inicio</a>
             <a href="/ProyectoFinalDS7/prueba.php">Libros</a>
             <a href="/ProyectoFinalDS7/views/reservation.php">Mis Reservas</a>
-            <a href="/ProyectoFinalDS7/views/auth/rol.php">Roles</a>
+            <?php if (!empty($userData) && $userData['role'] === 'admin'): ?>
+                <a href="/ProyectoFinalDS7/views/auth/rol.php">Roles</a>
+            <?php endif; ?>
             <a href="/ProyectoFinalDS7/views/profile.php">Perfil</a>
         </nav>
     </header>

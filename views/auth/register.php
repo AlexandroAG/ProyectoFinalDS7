@@ -71,13 +71,8 @@
                     <label for="email">Correo Electrónico:</label>
                     <input type="email" id="email" name="email" required>
                 </div>
-                <div class="form-group">
-                    <label for="role">Rol:</label>
-                    <select id="role" name="role" required>
-                        <option value="estudiante">Estudiante</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
+                <!-- El rol será automáticamente "estudiante" para registros públicos -->
+                <input type="hidden" name="role" value="estudiante">
                 <div class="form-group">
                     <label for="password">Contraseña:</label>
                     <input type="password" id="password" name="password" required>

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../class/UniversalSatinizer.php';
+require_once __DIR__ . '/../config/Database.php';
 
 class AuthController {
     private $userModel;
@@ -141,6 +142,50 @@ $sql = "SELECT primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
 
     return [];
 }
+
+    public function updateProfile($data) {
+        if (!isset($_SESSION['user_id'])) {
+            return false;
+        }
+
+        $id = $_SESSION['user_id'];
+        $conn = (new Database())->connect();
+
+        try {
+            // Separar el nombre completo en primer nombre y primer apellido
+            $fullName = trim($data['full_name']);
+            $nameParts = explode(' ', $fullName, 2);
+            $primerNombre = $nameParts[0];
+            $primerApellido = isset($nameParts[1]) ? $nameParts[1] : '';
+
+            $sql = "UPDATE usuarios SET 
+                    primer_nombre = :primer_nombre,
+                    primer_apellido = :primer_apellido,
+                    telefono = :telefono,
+                    imagen_perfil = :imagen_perfil
+                    WHERE id = :id";
+
+            $stmt = $conn->prepare($sql);
+            $result = $stmt->execute([
+                'primer_nombre' => $this->sanitizer->name($primerNombre),
+                'primer_apellido' => $this->sanitizer->name($primerApellido),
+                'telefono' => $this->sanitizer->phoneNumber($data['telefono'], false),
+                'imagen_perfil' => $this->sanitizer->basicString($data['imagen_perfil']),
+                'id' => $id
+            ]);
+
+            // Actualizar la sesión con los nuevos datos
+            if ($result) {
+                $_SESSION['full_name'] = $fullName;
+                $_SESSION['telefono'] = $data['telefono'];
+                $_SESSION['imagen_perfil'] = $data['imagen_perfil'];
+            }
+
+            return $result;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
 
 
 }

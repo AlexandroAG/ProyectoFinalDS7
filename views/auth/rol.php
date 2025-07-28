@@ -1,6 +1,16 @@
 <?php
 require_once __DIR__ . '/../../controllers/auth_middleware.php';
-require_once __DIR__ . '/../../config/Database.php'; // Asegúrate que este archivo tenga $conn = new mysqli(...)
+require_once __DIR__ . '/../../controllers/AuthController.php';
+require_once __DIR__ . '/../../config/Database.php';
+
+// Verificar que el usuario sea admin
+$authController = new AuthController();
+$userData = $authController->getProfileData();
+
+if (empty($userData) || $userData['role'] !== 'admin') {
+    header('Location: ../../index.php?error=acceso_denegado');
+    exit;
+}
 
 $database = new Database();
 $conn = $database->connect();
@@ -26,10 +36,10 @@ $conn = $database->connect();
     <header>
         <div class="logo">📚Sistema de Biblioteca</div>
         <nav>
-            <a href="/ProyectoFinalDS7/prueba.php">Inicio</a>
-            <a href="/ProyectoFinalDS7/index.php">Libros</a>
-            <!-- <a href="#">Reservados</a> -->
-            <a href="./views/auth/rol.php">Roles</a>
+            <a href="/ProyectoFinalDS7/index.php">Inicio</a>
+            <a href="/ProyectoFinalDS7/prueba.php">Libros</a>
+            <a href="/ProyectoFinalDS7/views/reservation.php">Mis Reservas</a>
+            <a href="/ProyectoFinalDS7/views/auth/rol.php">Roles</a>
             <a href="/ProyectoFinalDS7/views/profile.php">Perfil</a>
         </nav>
     </header>
@@ -37,6 +47,13 @@ $conn = $database->connect();
     <main>
 
         <h1>Lista de Usuarios Registrados</h1>
+
+        <!-- Botón para crear nuevo usuario -->
+        <div style="margin-bottom: 20px;">
+            <a href="create_user.php" class="btn-crear" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; transition: all 0.3s ease;">
+                ➕ Crear Nuevo Usuario
+            </a>
+        </div>
 
          <?php if (isset($_GET['eliminado'])): ?>
             <div class="mensaje" id="mensajeEliminacion"
