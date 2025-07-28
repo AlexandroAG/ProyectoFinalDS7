@@ -34,7 +34,7 @@ class AuthController {
                     // Guardar todos los datos necesarios para el perfil
                     $_SESSION['user_id'] = $this->sanitizer->integer($user['id']);
                     $_SESSION['username'] = $this->sanitizer->htmlSpecialChars($user['username']);
-                    $_SESSION['role'] = $this->sanitizer->role($user['role']);
+                    $_SESSION['usuario_rol'] = $this->sanitizer->role($user['role']);
                     $_SESSION['full_name'] = $this->sanitizer->name($user['full_name']);
                     $_SESSION['email'] = $this->sanitizer->email($user['email'] ?? '');
                     $_SESSION['cedula'] = $this->sanitizer->cedulaPanama($user['cedula'] ?? '');
@@ -121,18 +121,27 @@ class AuthController {
     }
 
     public function getProfileData() {
-        $this->checkAuth();
-        
-        return [
-            'id' => $_SESSION['user_id'],
-            'username' => $_SESSION['username'],
-            'role' => $_SESSION['role'],
-            'full_name' => !empty($_SESSION['full_name']) ? $this->sanitizer->name($_SESSION['full_name']) : 'No especificado',
-            'email' => !empty($_SESSION['email']) ? $this->sanitizer->email($_SESSION['email']) : 'no-email@example.com',
-            'cedula' => $_SESSION['cedula'] ?? '',
-            'telefono' => $_SESSION['telefono'] ?? '',
-            'imagen_perfil' => $_SESSION['imagen_perfil'] ?? ''
-        ];
+    if (!isset($_SESSION['user_id'])) {
+        return [];
     }
+
+    $id = $_SESSION['user_id'];
+    $conn = (new Database())->connect();
+$sql = "SELECT primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, imagen_perfil, email, role, cedula, telefono FROM usuarios WHERE id = :id LIMIT 1";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute(['id' => $id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user) {
+        // Armar nombre completo
+        $user['full_name'] = $user['primer_nombre'] . ' ' . $user['primer_apellido'];
+        return $user;
+    }
+
+    return [];
+}
+
+
 }
 ?>

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -25,8 +24,7 @@
             <h2>Registro de Usuario</h2>
 
             <?php
-            // Los mensajes de error de PHP se mostrarán aquí si process_registration.php redirige con 'error'
-            // Los mensajes de éxito se mostrarán en registration_status.php
+           
             if (isset($_GET['error'])) {
                 echo '<div class="mensaje error">' . htmlspecialchars($_GET['error']) . '</div>';
             }
@@ -90,8 +88,7 @@
                 </div>
                 <div class="form-group">
                     <label for="user_image">Imagen de Usuario:</label>
-                    <input type="file" id="user_image" name="user_image" accept="image/*
-                    ">
+                    <input type="file" id="user_image" name="user_image" accept="image/*">
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-cancel" onclick="window.location.href='login.php'">Cancelar</button>
@@ -102,7 +99,7 @@
     </div>
 
     <!-- Enlace al archivo JavaScript externo -->
-    <script src="../../assets/js/register_script.js"></script>
+    <script src="../../js/register_script.js"></script>
 </body>
 </html>
 

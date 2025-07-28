@@ -1,4 +1,104 @@
 
+<?php
+require_once './config/Database.php';
+
+$mensaje = '';
+$error = '';
+
+if (isset($_POST['agregar_libro'])) {
+    $titulo = trim($_POST['titulo'] ?? '');
+    $autor = trim($_POST['autor'] ?? '');
+    $isbn = trim($_POST['isbn'] ?? '');
+    $descripcion = trim($_POST['descripcion'] ?? '');
+    $categoria = trim($_POST['categoria'] ?? '');
+    $stock = (int) ($_POST['stock'] ?? 1);
+    $anio_publicacion = (int) ($_POST['anio_publicacion'] ?? 0);
+
+    if (!$titulo || !$autor || !$isbn || !$descripcion || !$categoria || $stock < 1 || $anio_publicacion < 1500 || $anio_publicacion > (int)date('Y')) {
+        $error = "Por favor complete todos los campos correctamente, incluyendo el año válido.";
+    } else {
+        // Procesar imagen subida
+        if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+            $fileTmpPath = $_FILES['imagen']['tmp_name'];
+            $fileName = $_FILES['imagen']['name'];
+            $fileNameCmps = explode(".", $fileName);
+            $fileExtension = strtolower(end($fileNameCmps));
+            $allowedfileExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+            if (in_array($fileExtension, $allowedfileExtensions)) {
+                $uploadFileDir = './uploads/';
+                if (!is_dir($uploadFileDir)) {
+                    mkdir($uploadFileDir, 0755, true);
+                }
+                $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+                $dest_path = $uploadFileDir . $newFileName;
+                if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                    $imagen_path = $dest_path;
+                    $thumbnail_path = $dest_path; // Puedes hacer un thumbnail real si quieres
+                } else {
+                    $error = 'Error al mover el archivo de imagen.';
+                }
+            } else {
+                $error = 'Tipo de archivo no permitido. Solo JPG, JPEG, PNG, GIF.';
+            }
+        } else {
+            $imagen_path = null;
+            $thumbnail_path = null;
+        }
+
+        if (!$error) {
+            $database = new Database();
+            $conn = $database->connect();
+
+            if ($conn) {
+                try {
+                    // Categoría
+                    $stmtCat = $conn->prepare("SELECT id FROM categorias_libros WHERE nombre = :nombre");
+                    $stmtCat->execute([':nombre' => $categoria]);
+                    $cat = $stmtCat->fetch(PDO::FETCH_ASSOC);
+                    if ($cat) {
+                        $categoria_id = $cat['id'];
+                    } else {
+                        $stmtInsertCat = $conn->prepare("INSERT INTO categorias_libros (nombre) VALUES (:nombre)");
+                        $stmtInsertCat->execute([':nombre' => $categoria]);
+                        $categoria_id = $conn->lastInsertId();
+                    }
+
+                    // Insertar libro
+                    $sql = "INSERT INTO libros 
+                        (titulo, autor, isbn, descripcion, categoria_id, cantidad, cantidad_disponible, anio_publicacion, imagen_path, thumbnail_path) 
+                        VALUES 
+                        (:titulo, :autor, :isbn, :descripcion, :categoria_id, :cantidad, :cantidad_disponible, :anio_publicacion, :imagen_path, :thumbnail_path)";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute([
+                        ':titulo' => $titulo,
+                        ':autor' => $autor,
+                        ':isbn' => $isbn,
+                        ':descripcion' => $descripcion,
+                        ':categoria_id' => $categoria_id,
+                        ':cantidad' => $stock,
+                        ':cantidad_disponible' => $stock,
+                        ':anio_publicacion' => $anio_publicacion,
+                        ':imagen_path' => $imagen_path,
+                        ':thumbnail_path' => $thumbnail_path
+                    ]);
+                    $mensaje = "Libro agregado correctamente.";
+                } catch (PDOException $e) {
+                    if ($e->errorInfo[1] == 1062) {
+                        $error = "El ISBN ya existe en la base de datos.";
+                    } else {
+                        $error = "Error al insertar el libro: " . $e->getMessage();
+                    }
+                }
+            } else {
+                $error = "No se pudo conectar a la base de datos.";
+            }
+        }
+    }
+}
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -181,6 +281,10 @@
                         <input type="text" name="autor" placeholder="Autor del libro" required>
                     </div>
                     <div class="form-group">
+                        <label for="isbn">ISBN:</label>
+                        <input type="text" name="isbn" placeholder="ISBN del libro" required>
+                    </div>
+                    <div class="form-group">
                         <label for="descripcion">Descripción:</label>
                         <textarea name="descripcion" rows="4" placeholder="Descripción del libro" required></textarea>
                     </div>
@@ -193,13 +297,19 @@
                         <input type="number" name="stock" value="1" min="1" placeholder="Cantidad en stock" required>
                     </div>
                     <div class="form-group">
-                        <label for="imagen">Imagen del libro:</label>
-                        <input type="file" name="imagen">
+                        <label for="anio_publicacion">Año de publicación:</label>
+                        <input type="number" name="anio_publicacion" min="1500" max="<?php echo date('Y'); ?>" placeholder="Ejemplo: 2020" required>
                     </div>
+                    <div class="form-group">
+                        <label for="imagen">Imagen del libro:</label>
+                        <input type="file" name="imagen" accept="image/*">
+                    </div>
+
                     <div class="form-actions">
                         <button type="submit" name="agregar_libro">Agregar libro</button>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>

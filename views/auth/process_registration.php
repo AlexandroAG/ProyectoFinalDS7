@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../class/UniversalSanitizer.php';
+require_once __DIR__ . '/../../class/UniversalSatinizer.php';
 
 // Configuración de entorno
 error_reporting(E_ALL);
@@ -77,7 +77,8 @@ try {
     $stmt_check->close();
 
     // Procesar imagen de usuario
-    $image_path_for_db = $this->handleProfileImageUpload($sanitizer);
+    $image_path_for_db = handleProfileImageUpload($sanitizer);
+
 
     // Hashear la contraseña
     $hashed_password = password_hash($data['password'], PASSWORD_DEFAULT);

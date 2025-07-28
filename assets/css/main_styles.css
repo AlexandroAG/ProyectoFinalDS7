@@ -1,8 +1,9 @@
-    body {
+body {
         margin: 0;
         font-family: 'Montserrat', sans-serif;
         /* Fuente principal del cuerpo */
         background-color: #fff;
+        
         /* Fondo general */
     }
 
@@ -245,4 +246,3 @@
             padding: 15px;
         }
     }
-    
