@@ -6,6 +6,35 @@ require_once __DIR__ . '/../controllers/auth_middleware.php';
 $reservationController = new ReservationController();
 $authController = new AuthController();
 
+// Función para generar ISBN simulado único para cada reserva
+function generateReservationISBN($reservaId, $libroId, $usuarioId) {
+    // Crear un hash único basado en los IDs
+    $hash = md5($reservaId . '-' . $libroId . '-' . $usuarioId . '-reservation');
+    
+    // Extraer números del hash
+    $numbers = preg_replace('/[^0-9]/', '', $hash);
+    
+    // Tomar los primeros 12 dígitos
+    $isbn12 = substr($numbers, 0, 12);
+    
+    // Si no hay suficientes números, rellenar con ceros
+    $isbn12 = str_pad($isbn12, 12, '0', STR_PAD_RIGHT);
+    
+    // Calcular dígito de control para ISBN-13
+    $sum = 0;
+    for ($i = 0; $i < 12; $i++) {
+        $weight = ($i % 2 == 0) ? 1 : 3;
+        $sum += intval($isbn12[$i]) * $weight;
+    }
+    $checkDigit = (10 - ($sum % 10)) % 10;
+    
+    // Formar ISBN-13 con prefijo 978 (estándar para libros)
+    $isbn13 = '978' . substr($isbn12, 3) . $checkDigit;
+    
+    // Formatear como ISBN estándar: 978-X-XXXX-XXXX-X
+    return '978-' . substr($isbn13, 3, 1) . '-' . substr($isbn13, 4, 4) . '-' . substr($isbn13, 8, 4) . '-' . substr($isbn13, 12, 1);
+}
+
 // Obtener datos del usuario
 $userData = $authController->getProfileData();
 
@@ -110,6 +139,22 @@ $stats = $reservationController->getUserStats();
             margin: 0.25rem 0;
             color: #666;
             font-size: 0.9rem;
+        }
+
+        .isbn-reserva {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .isbn-original {
+            color: #666;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
         }
 
         .reservation-details {
@@ -290,7 +335,14 @@ $stats = $reservationController->getUserStats();
                             <div class="book-info">
                                 <h3><?php echo htmlspecialchars($reserva['titulo']); ?></h3>
                                 <p><strong>Autor:</strong> <?php echo htmlspecialchars($reserva['autor']); ?></p>
-                                <p><strong>ISBN:</strong> <?php echo htmlspecialchars($reserva['isbn']); ?></p>
+                                <p><strong><i class="fas fa-barcode"></i> ISBN Original:</strong> 
+                                    <span class="isbn-original"><?php echo htmlspecialchars($reserva['isbn']); ?></span>
+                                </p>
+                                <p><strong><i class="fas fa-bookmark" style="color: #667eea;"></i> ISBN Reserva:</strong> 
+                                    <span class="isbn-reserva">
+                                        <?php echo generateReservationISBN($reserva['id'], $reserva['libro_id'], $userData['id'] ?? 0); ?>
+                                    </span>
+                                </p>
                                 <?php if (!empty($reserva['categoria_nombre'])): ?>
                                     <p><strong>Categoría:</strong> <?php echo htmlspecialchars($reserva['categoria_nombre']); ?></p>
                                 <?php endif; ?>

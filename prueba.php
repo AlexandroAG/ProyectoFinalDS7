@@ -1,6 +1,11 @@
 <?php
 require_once __DIR__ . '/controllers/auth_middleware.php';
+require_once __DIR__ . '/controllers/AuthController.php';
 require_once './config/Database.php';
+
+// Obtener datos del usuario para verificar rol
+$authController = new AuthController();
+$userData = $authController->getProfileData();
 
 // Buscar filtros
 $searchTerm = $_GET['search'] ?? '';
@@ -157,6 +162,33 @@ header {
             opacity: 1;
         }
 
+        .excel-export-btn {
+            background: linear-gradient(135deg, #1e7e34 0%, #28a745 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+
+        .excel-export-btn:hover {
+            background: linear-gradient(135deg, #155724 0%, #1e7e34 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .excel-export-btn i {
+            margin-right: 8px;
+            font-size: 1.1em;
+        }
+
         @media (max-width: 768px) {
             .filters-container {
                 flex-direction: column;
@@ -195,6 +227,14 @@ header {
 
         <button type="submit"><i class="fas fa-search"></i> Filtrar</button>
     </form>
+
+    <?php if (!empty($userData) && $userData['role'] === 'admin'): ?>
+        <div style="margin-top: 15px; text-align: center;">
+            <a href="controllers/exportar_excel.php" class="excel-export-btn">
+                <i class="fas fa-file-excel"></i> Descargar Reporte Excel
+            </a>
+        </div>
+    <?php endif; ?>
 </div>
 
 <main>
@@ -238,6 +278,7 @@ header {
             case 'no_disponible': echo "Este libro no está disponible actualmente."; break;
             case 'ya_reservado': echo "Ya tienes este libro reservado."; break;
             case 'libro_no_encontrado': echo "El libro solicitado no fue encontrado."; break;
+            case 'acceso_denegado': echo "Acceso denegado. Solo los administradores pueden descargar reportes."; break;
             default: echo "Error desconocido.";
         }
         ?>

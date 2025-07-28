@@ -273,7 +273,56 @@ if (isset($_POST['agregar_libro'])) {
         .form-style-modern button[type="submit"]:hover {
             background-color: #2cb511ff;
         }
+
+        /* Estilos para el campo de categoría dinámica */
+        .categoria-container {
+            margin-bottom: 10px;
+        }
+
+        .categoria-nueva {
+            display: none;
+            margin-top: 8px;
+        }
+
+        .categoria-nueva input {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px;
+        }
+
+        .form-style-modern select {
+            width: 100%;
+            padding: 5px 0;
+            border: none;
+            border-bottom: 1px solid #ccc;
+            border-radius: 0;
+            outline: none;
+            font-size: 0.9em;
+            color: #333;
+            background-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .form-style-modern select:focus {
+            border-bottom-color: #ffffffff;
+        }
     </style>
+    <script>
+        function toggleCategoriaNueva() {
+            const select = document.getElementById('categoria_existente');
+            const nuevaDiv = document.getElementById('categoria_nueva_div');
+            const nuevaInput = document.getElementById('categoria_nueva');
+            
+            if (select.value === 'nueva') {
+                nuevaDiv.style.display = 'block';
+                nuevaInput.required = true;
+            } else {
+                nuevaDiv.style.display = 'none';
+                nuevaInput.required = false;
+                nuevaInput.value = '';
+            }
+        }
+    </script>
 </head>
 <body>
     <?php if (isset($mensaje)): ?>
@@ -311,8 +360,23 @@ if (isset($_POST['agregar_libro'])) {
                         <textarea name="descripcion" rows="4" placeholder="Descripción del libro" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="categoria">Categoría:</label>
-                        <input type="text" name="categoria" placeholder="Categoría (Ej: Ficción, Ciencia)" required>
+                        <label for="categoria_existente">Categoría:</label>
+                        <div class="categoria-container">
+                            <select name="categoria_existente" id="categoria_existente" onchange="toggleCategoriaNueva()" required>
+                                <option value="">Seleccionar categoría...</option>
+                                <?php foreach ($categorias_existentes as $categoria): ?>
+                                    <option value="<?= htmlspecialchars($categoria['nombre']) ?>">
+                                        <?= htmlspecialchars($categoria['nombre']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                                <option value="nueva">➕ Crear nueva categoría</option>
+                            </select>
+                            
+                            <div id="categoria_nueva_div" class="categoria-nueva">
+                                <label for="categoria_nueva">Nueva categoría:</label>
+                                <input type="text" name="categoria_nueva" id="categoria_nueva" placeholder="Nombre de la nueva categoría">
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="stock">Stock disponible:</label>

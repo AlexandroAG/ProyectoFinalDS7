@@ -148,7 +148,7 @@ $userData = $authController->getProfileData();
             <div class="action-buttons">
                 <a href="edit_profile.php" class="btn btn-primary">Editar Perfil</a>
                 <a href="../controllers/logout.php" class="btn btn-danger">Cerrar Sesión</a>
-                <a href="../controllers/exportar_libros.php" class="btn btn-success">📥 Exportar libros a CSV</a>
+                <!-- <a href="../controllers/exportar_libros.php" class="btn btn-success">📥 Exportar libros a CSV</a> -->
             </div>
         </div>
     </main>
