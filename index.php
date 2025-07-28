@@ -1,6 +1,10 @@
 
 <?php
 require_once __DIR__ . '/controllers/auth_middleware.php';
+require_once __DIR__ . '/controllers/AuthController.php';
+
+$authController = new AuthController();
+$userData = $authController->getProfileData();
 ?>
 
 
@@ -35,7 +39,9 @@ require_once __DIR__ . '/controllers/auth_middleware.php';
         <p>Descubre el Mundo, Desvela tu imaginación : Tu Aventura Comienza Aquí</p>
         <!-- MODIFICADO: El botón ahora apunta directamente a Formulario.html -->
 
-        <a href="Formulario.php" class="btn">Crear Nuevo Libro</a>
+        <?php if (!empty($userData) && $userData['role'] === 'admin'): ?>
+            <a href="Formulario.php" class="btn">Crear Nuevo Libro</a>
+        <?php endif; ?>
 
     </section>
 
