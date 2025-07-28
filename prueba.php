@@ -258,6 +258,14 @@ header {
                         <input type="hidden" name="libro_id" value="<?= $libro['id'] ?>">
                         <button type="submit">Reservar</button>
                     </form>
+                    <?php if (!empty($userData) && $userData['role'] === 'admin'): ?>
+                        <form action="controllers/eliminar_libro.php" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este libro? Esta acción no se puede deshacer.');" style="margin-top:8px;">
+                            <input type="hidden" name="libro_id" value="<?= $libro['id'] ?>">
+                            <button type="submit" style="background:#dc3545;color:white;padding:8px 0;border-radius:4px;width:100%;font-weight:bold;border:none;cursor:pointer;">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </form>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>

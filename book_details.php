@@ -2,6 +2,8 @@
 require_once __DIR__ . '/controllers/auth_middleware.php';
 require_once __DIR__ . '/controllers/ReservationController.php';
 require_once './config/Database.php';
+require_once __DIR__ . '/controllers/BookAdminController.php';
+require_once __DIR__ . '/controllers/AuthController.php';
 
 // Verificar que se haya proporcionado un ID de libro
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
@@ -31,10 +33,39 @@ if (!$libro) {
 }
 
 // Verificar si el usuario ya tiene este libro reservado
+// Obtener datos de usuario para verificar rol
 $reservationController = new ReservationController();
+$authController = new AuthController();
+$userData = $authController->getProfileData();
 $yaReservado = false;
 if (isset($_SESSION['user_id'])) {
     $yaReservado = $reservationController->hasActiveReservation($libroId);
+}
+
+// Procesar edición si es admin y se envió el formulario
+$bookAdminController = new BookAdminController();
+$editSuccess = null;
+if (!empty($userData) && $userData['role'] === 'admin' && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_book'])) {
+    $updateData = [
+        'titulo' => $_POST['titulo'],
+        'autor' => $_POST['autor'],
+        'isbn' => $_POST['isbn'],
+        'descripcion' => $_POST['descripcion'],
+        'categoria_id' => $_POST['categoria_id'],
+        'cantidad' => $_POST['cantidad'],
+        'cantidad_disponible' => $_POST['cantidad_disponible'],
+        'anio_publicacion' => $_POST['anio_publicacion']
+    ];
+    $editSuccess = $bookAdminController->updateBook($libroId, $updateData);
+    // Refrescar datos del libro
+    $libro = $bookAdminController->getBookById($libroId);
+}
+
+// Procesar eliminación si es admin y se envió el formulario de eliminar
+if (!empty($userData) && $userData['role'] === 'admin' && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_book'])) {
+    $bookAdminController->deleteBook($libroId);
+    header('Location: prueba.php?success=eliminado');
+    exit;
 }
 ?>
 
@@ -410,7 +441,66 @@ if (isset($_SESSION['user_id'])) {
                     <?= $yaReservado ? 'Ya reservado' : 'No disponible' ?>
                 </button>
             <?php endif; ?>
+
+            <?php if (!empty($userData) && $userData['role'] === 'admin'): ?>
+                <button class="btn btn-primary" onclick="document.getElementById('edit-form-section').style.display='block';window.scrollTo(0,document.body.scrollHeight);return false;">
+                    <i class="fas fa-edit"></i> Editar libro
+                </button>
+                <form action="" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este libro? Esta acción no se puede deshacer.');">
+                    <input type="hidden" name="delete_book" value="1">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-trash"></i> Eliminar libro
+                    </button>
+                </form>
+            <?php endif; ?>
         </div>
+
+        <?php if (!empty($userData) && $userData['role'] === 'admin'): ?>
+        <div id="edit-form-section" style="display:<?= (isset($_POST['edit_book']) ? 'block' : 'none') ?>;margin-top:2rem;">
+            <h2>Editar libro</h2>
+            <?php if ($editSuccess === true): ?>
+                <div class="alert alert-success">¡Libro actualizado correctamente!</div>
+            <?php elseif ($editSuccess === false): ?>
+                <div class="alert alert-danger">Error al actualizar el libro.</div>
+            <?php endif; ?>
+            <form action="" method="POST" style="background:#f8f9fa;padding:2rem;border-radius:12px;max-width:600px;">
+                <input type="hidden" name="edit_book" value="1">
+                <div style="margin-bottom:1rem;">
+                    <label>Título:</label>
+                    <input type="text" name="titulo" value="<?= htmlspecialchars($libro['titulo']) ?>" required style="width:100%;padding:0.5rem;">
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label>Autor:</label>
+                    <input type="text" name="autor" value="<?= htmlspecialchars($libro['autor']) ?>" required style="width:100%;padding:0.5rem;">
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label>ISBN:</label>
+                    <input type="text" name="isbn" value="<?= htmlspecialchars($libro['isbn']) ?>" required style="width:100%;padding:0.5rem;">
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label>Descripción:</label>
+                    <textarea name="descripcion" style="width:100%;padding:0.5rem;" rows="3"><?= htmlspecialchars($libro['descripcion']) ?></textarea>
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label>Categoría (ID):</label>
+                    <input type="number" name="categoria_id" value="<?= htmlspecialchars($libro['categoria_id']) ?>" required style="width:100%;padding:0.5rem;">
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label>Cantidad total:</label>
+                    <input type="number" name="cantidad" value="<?= htmlspecialchars($libro['cantidad']) ?>" required style="width:100%;padding:0.5rem;">
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label>Cantidad disponible:</label>
+                    <input type="number" name="cantidad_disponible" value="<?= htmlspecialchars($libro['cantidad_disponible']) ?>" required style="width:100%;padding:0.5rem;">
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label>Año de publicación:</label>
+                    <input type="number" name="anio_publicacion" value="<?= htmlspecialchars($libro['anio_publicacion']) ?>" style="width:100%;padding:0.5rem;">
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar cambios</button>
+            </form>
+        </div>
+        <?php endif; ?>
     </main>
 </body>
 </html>
