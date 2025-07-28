@@ -31,13 +31,11 @@ $stmt = $conn->prepare($sql);
 $stmt->execute($params);
 $libros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Categorías simuladas
-$categories = [
-    ['id' => 1, 'name' => 'Ficción'],
-    ['id' => 2, 'name' => 'Ciencia'],
-    ['id' => 3, 'name' => 'Historia'],
-    ['id' => 4, 'name' => 'Programación']
-];
+// Obtener categorías reales de la base de datos
+$categoriesSql = "SELECT id, nombre FROM categorias_libros ORDER BY nombre";
+$categoriesStmt = $conn->prepare($categoriesSql);
+$categoriesStmt->execute();
+$categories = $categoriesStmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -190,7 +188,7 @@ header {
             <option value="">Todas las Categorías</option>
             <?php foreach ($categories as $cat): ?>
                 <option value="<?= $cat['id'] ?>" <?= ($categoryId == $cat['id']) ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($cat['name']) ?>
+                    <?= htmlspecialchars($cat['nombre']) ?>
                 </option>
             <?php endforeach; ?>
         </select>

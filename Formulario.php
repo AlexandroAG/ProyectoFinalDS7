@@ -5,17 +5,41 @@ require_once './config/Database.php';
 $mensaje = '';
 $error = '';
 
+// Obtener categorías existentes de la base de datos
+$database = new Database();
+$conn = $database->connect();
+$categorias_existentes = [];
+
+if ($conn) {
+    try {
+        $stmt = $conn->prepare("SELECT id, nombre FROM categorias_libros ORDER BY nombre");
+        $stmt->execute();
+        $categorias_existentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        $error = "Error al cargar categorías: " . $e->getMessage();
+    }
+}
+
 if (isset($_POST['agregar_libro'])) {
     $titulo = trim($_POST['titulo'] ?? '');
     $autor = trim($_POST['autor'] ?? '');
     $isbn = trim($_POST['isbn'] ?? '');
     $descripcion = trim($_POST['descripcion'] ?? '');
-    $categoria = trim($_POST['categoria'] ?? '');
+    $categoria_existente = trim($_POST['categoria_existente'] ?? '');
+    $categoria_nueva = trim($_POST['categoria_nueva'] ?? '');
     $stock = (int) ($_POST['stock'] ?? 1);
     $anio_publicacion = (int) ($_POST['anio_publicacion'] ?? 0);
 
-    if (!$titulo || !$autor || !$isbn || !$descripcion || !$categoria || $stock < 1 || $anio_publicacion < 1500 || $anio_publicacion > (int)date('Y')) {
-        $error = "Por favor complete todos los campos correctamente, incluyendo el año válido.";
+    // Determinar qué categoría usar
+    $categoria_final = '';
+    if ($categoria_existente === 'nueva' && !empty($categoria_nueva)) {
+        $categoria_final = $categoria_nueva;
+    } elseif (!empty($categoria_existente) && $categoria_existente !== 'nueva') {
+        $categoria_final = $categoria_existente;
+    }
+
+    if (!$titulo || !$autor || !$isbn || !$descripcion || !$categoria_final || $stock < 1 || $anio_publicacion < 1500 || $anio_publicacion > (int)date('Y')) {
+        $error = "Por favor complete todos los campos correctamente, incluyendo una categoría válida y el año válido.";
     } else {
         // Procesar imagen subida
         if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
@@ -49,21 +73,19 @@ if (isset($_POST['agregar_libro'])) {
             $database = new Database();
             $conn = $database->connect();
 
-            if ($conn) {
+                if ($conn) {
                 try {
-                    // Categoría
+                    // Categoría - buscar por nombre o crear nueva
                     $stmtCat = $conn->prepare("SELECT id FROM categorias_libros WHERE nombre = :nombre");
-                    $stmtCat->execute([':nombre' => $categoria]);
+                    $stmtCat->execute([':nombre' => $categoria_final]);
                     $cat = $stmtCat->fetch(PDO::FETCH_ASSOC);
                     if ($cat) {
                         $categoria_id = $cat['id'];
                     } else {
                         $stmtInsertCat = $conn->prepare("INSERT INTO categorias_libros (nombre) VALUES (:nombre)");
-                        $stmtInsertCat->execute([':nombre' => $categoria]);
+                        $stmtInsertCat->execute([':nombre' => $categoria_final]);
                         $categoria_id = $conn->lastInsertId();
-                    }
-
-                    // Insertar libro
+                    }                    // Insertar libro
                     $sql = "INSERT INTO libros 
                         (titulo, autor, isbn, descripcion, categoria_id, cantidad, cantidad_disponible, anio_publicacion, imagen_path, thumbnail_path) 
                         VALUES 
