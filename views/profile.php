@@ -113,9 +113,9 @@ $userData = $authController->getProfileData();
     <header>
         <div class="logo">📚Sistema de Biblioteca</div>
         <nav>
-            <a href="/ProyectoFinalDS7/prueba.php">Inicio</a>
-            <a href="/ProyectoFinalDS7/index.php">Libros</a>
-            <!-- <a href="#">Reservados</a> -->
+            <a href="/ProyectoFinalDS7/index.php">Inicio</a>
+            <a href="/ProyectoFinalDS7/prueba.php">Libros</a>
+            <a href="/ProyectoFinalDS7/views/reservation.php">Mis Reservas</a>
             <a href="/ProyectoFinalDS7/views/auth/rol.php">Roles</a>
             <a href="/ProyectoFinalDS7/views/profile.php">Perfil</a>
         </nav>

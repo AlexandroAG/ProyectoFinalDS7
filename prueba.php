@@ -83,6 +83,16 @@ header {
 
         .book-card:hover {
             transform: scale(1.03);
+            cursor: pointer;
+        }
+
+        .book-card a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .book-card a:hover {
+            text-decoration: none;
         }
 
         .book-card img {
@@ -132,9 +142,9 @@ header {
     <header>
         <div class="logo">📚Sistema de Biblioteca</div>
         <nav>
-            <a href="/ProyectoFinalDS7/prueba.php">Inicio</a>
-            <a href="/ProyectoFinalDS7/index.php">Libros</a>
-            <!-- <a href="#">Reservados</a> -->
+            <a href="/ProyectoFinalDS7/index.php">Inicio</a>
+            <a href="/ProyectoFinalDS7/prueba.php">Libros</a>
+            <a href="/ProyectoFinalDS7/views/reservation.php">Mis Reservas</a>
             <a href="/ProyectoFinalDS7/views/auth/rol.php">Roles</a>
             <a href="/ProyectoFinalDS7/views/profile.php">Perfil</a>
         </nav>
@@ -167,13 +177,15 @@ header {
         <div class="book-grid">
             <?php foreach ($libros as $libro): ?>
                 <div class="book-card">
-                    <img src="<?= htmlspecialchars($libro['imagen_path'] ?: 'default.jpg') ?>" alt="Portada del libro">
-                    <div class="book-info">
-                        <h3><?= htmlspecialchars($libro['titulo']) ?></h3>
-                        <p><strong>Autor:</strong> <?= htmlspecialchars($libro['autor']) ?></p>
-                        <p><strong>Categoría:</strong> <?= htmlspecialchars($libro['categoria_nombre']) ?></p>
-                        <p><strong>Año:</strong> <?= htmlspecialchars($libro['anio_publicacion']) ?></p>
-                    </div>
+                    <a href="book_details.php?id=<?= $libro['id'] ?>" style="text-decoration: none; color: inherit;">
+                        <img src="<?= htmlspecialchars($libro['imagen_path'] ?: 'default.jpg') ?>" alt="Portada del libro">
+                        <div class="book-info">
+                            <h3><?= htmlspecialchars($libro['titulo']) ?></h3>
+                            <p><strong>Autor:</strong> <?= htmlspecialchars($libro['autor']) ?></p>
+                            <p><strong>Categoría:</strong> <?= htmlspecialchars($libro['categoria_nombre']) ?></p>
+                            <p><strong>Año:</strong> <?= htmlspecialchars($libro['anio_publicacion']) ?></p>
+                        </div>
+                    </a>
                     <form action="reservar_libro.php" method="POST">
                         <input type="hidden" name="libro_id" value="<?= $libro['id'] ?>">
                         <button type="submit">Reservar</button>
@@ -195,6 +207,8 @@ header {
             case 'not_logged_in': echo "Debes iniciar sesión para reservar."; break;
             case 'no_libro': echo "Libro no especificado para reservar."; break;
             case 'sql_error': echo "Error al realizar la reserva."; break;
+            case 'no_disponible': echo "Este libro no está disponible actualmente."; break;
+            case 'ya_reservado': echo "Ya tienes este libro reservado."; break;
             default: echo "Error desconocido.";
         }
         ?>

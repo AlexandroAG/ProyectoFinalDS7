@@ -28,7 +28,7 @@ $userData = $authController->getProfileData();
         <nav>
             <a href="index.php">Inicio</a>
             <a href="prueba.php">Libros</a>
-            <!-- <a href="#">Reservados</a> -->
+            <a href="./views/reservation.php">Mis Reservas</a>
             <a href="./views/auth/rol.php">Roles</a>
             <a href="/ProyectoFinalDS7/views/profile.php">Perfil</a>
         </nav>
