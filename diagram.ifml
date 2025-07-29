@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ifml="http://www.omg.org/spec/IFML/20140301" xmlns:ifmldi="http://www.omg.org/spec/IFML/20130218/IFML-DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.omg.org/spec/UML/20110701/">
+  <ifml:IFMLModel>
+    <interactionFlowModel xmi:type="ifml:InteractionFlowModel" xmi:id="_myModel">
+      <interactionFlowModelElements xmi:type="ifml:ViewContainer" xmi:id="ViewContainer_0xxanpc" uml:name="Sistema Web">
+        <inInteractionFlows>Flow_0f1zcqr</inInteractionFlows>
+        <viewElements xmi:type="ifml:ViewComponent" xmi:id="ViewComponent_0l218y1" uml:name="Formulario de Registro                                                                                                                                         &
