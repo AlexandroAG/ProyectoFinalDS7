@@ -66,3 +66,5 @@ out/
 *.swo
 *.tmp
 *.cache
+
+*.jpg
